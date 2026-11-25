@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snippexzero | High-Speed Websites, Presentations & Design</title>
+  <meta name="description" content="Snippexzero delivers fast, custom websites, high-impact PowerPoint presentations, and scroll-stopping graphic designs—engineered for speed, clarity, and results." />
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              950: '#070D1A',
+              900: '#0C162B',
+              800: '#122140',
+              700: '#1A2F5A',
+            },
+            electric: {
+              600: '#1D4ED8',
+              500: '#2563EB',
+              400: '#38BDF8',
+              300: '#7DD3FC',
+            },
+            gold: {
+              400: '#FBBF24',
+              300: '#FCD34D',
+            },
+            silver: {
+              200: '#E2E8F0',
+              300: '#CBD5E1',
+            }
+          },
+          boxShadow: {
+            'glow': '0 0 36px -8px rgba(37, 99, 235, 0.55)',
+            'glow-cyan': '0 0 30px -8px rgba(56, 189, 248, 0.38)',
+            'glow-gold': '0 0 24px -8px rgba(251, 191, 36, 0.35)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Custom Styles for 3D Perspective, Fluid Typography, Touch Targets & Glassmorphism -->
+  <style>
+    html {
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #070D1A;
+      color: #FFFFFF;
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100vw;
+      -webkit-tap-highlight-color: rgba(56, 189, 248, 0.2);
+    }
+
+    /* Fluid responsive headings for crisp scaling across phones and laptops */
+    .hero-title-fluid {
+      font-size: clamp(2.15rem, 6.2vw, 4.1rem);
+      line-height: 1.08;
+    }
+
+    .section-title-fluid {
+      font-size: clamp(1.75rem, 4.2vw, 3rem);
+      line-height: 1.15;
+    }
+
+    /* Ambient background mesh gradients */
+    .bg-grid-pattern {
+      background-size: 44px 44px;
+      background-image: 
+        linear-gradient(to right, rgba(203, 213, 225, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(203, 213, 225, 0.03) 1px, transparent 1px);
+    }
+
+    .glass-panel {
+      background: rgba(12, 22, 43, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.11);
+    }
+
+    .glass-panel-bright {
+      background: linear-gradient(145deg, rgba(18, 33, 64, 0.82), rgba(7, 13, 26, 0.9));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+    }
+
+    /* 3D Tilt Card System (Active on non-touch / hover-capable screens) */
+    .tilt-wrapper {
+      perspective: 1200px;
+    }
+
+    .tilt-card {
+      transform-style: preserve-3d;
+      transition: transform 0.2s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      will-change: transform;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .tilt-card:hover {
+        border-color: rgba(56, 189, 248, 0.48);
+        box-shadow: 0 24px 56px -14px rgba(37, 99, 235, 0.38);
+      }
+
+      .tilt-card:hover .tilt-glare {
+        opacity: 1;
+      }
+    }
+
+    /* Disable heavy 3D tilt & glare on coarse touch devices for zero-jank scrolling */
+    @media (hover: none), (pointer: coarse) {
+      .tilt-wrapper {
+        perspective: none;
+      }
+      .tilt-card {
+        transform-style: flat;
+        transform: none !important;
+      }
+      .tilt-glare {
+        display: none;
+      }
+      .animate-float-3d {
+        animation: none !important;
+      }
+    }
+
+    .tilt-content-z {
+      transform: translateZ(24px);
+    }
+
+    .tilt-badge-z {
+      transform: translateZ(38px);
+    }
+
+    .tilt-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.18), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Subtle floating keyframe for badge icons */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) translateZ(32px); }
+      50% { transform: translateY(-6px) translateZ(32px); }
+    }
+    .animate-float-3d {
+      animation: floatSlow 4.5s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-float-3d,
+      .animate-ping {
+        animation: none !important;
+      }
+      .tilt-card {
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070D1A;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1A2F5A;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2563EB;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-electric-500 selection:text-white bg-grid-pattern">
+
+  <!-- Toast Notification Box (Replaces any browser alert) -->
+  <div id="toast-notification" role="status" aria-live="polite" class="fixed bottom-4 sm:bottom-6 right-4 left-4 sm:left-auto z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="glass-panel-bright px-5 py-3.5 rounded-2xl shadow-glow flex items-center justify-center sm:justify-start gap-3 border border-electric-400/40 max-w-md mx-auto sm:mx-0">
+      <span class="w-2.5 h-2.5 rounded-full bg-gold-400 shrink-0"></span>
+      <p id="toast-message" class="text-sm font-medium text-white">Action completed!</p>
+    </div>
+  </div>
+
+  <!-- 1. STICKY GLASSMORPHIC NAVBAR -->
+  <header id="navbar" class="fixed top-0 inset-x-0 z-40 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4">
+      <nav aria-label="Primary Navigation" class="glass-panel rounded-2xl px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-lg">
+        <!-- Brand Logo with 3D Geometric Emblem -->
+        <a href="#top" class="flex items-center gap-2.5 sm:gap-3 group min-h-[44px] pr-1">
+          <div class="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-electric-500 via-electric-400 to-gold-400 p-[1px] shadow-glow transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3 shrink-0">
+            <div class="w-full h-full bg-navy-950 rounded-[11px] flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-tr from-electric-500/30 to-transparent"></div>
+              <svg class="w-5 h-5 text-electric-400 relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="flex flex-col leading-tight">
+            <span class="font-display font-extrabold text-base sm:text-xl tracking-tight text-white">
+              Snippex<span class="text-transparent bg-clip-text bg-gradient-to-r from-electric-400 via-electric-300 to-gold-300">zero</span>
+            </span>
+            <span class="text-[10px] uppercase tracking-[0.18em] text-silver-300 hidden sm:block">Digital Studio</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex items-center gap-7 lg:gap-8 text-sm font-medium text-silver-200">
+          <a href="#services" class="py-2 hover:text-electric-400 transition-colors">Services</a>
+          <a href="#why-fast" class="py-2 hover:text-electric-400 transition-colors">Why Fast</a>
+          <a href="#process" class="py-2 hover:text-electric-400 transition-colors">Process</a>
+          <a href="#configurator" class="py-2 hover:text-electric-400 transition-colors">Instant Quote</a>
+        </div>
+
+        <!-- CTA & Mobile Toggle -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <a href="#configurator" class="inline-flex items-center justify-center gap-1.5 sm:gap-2 min-h-[44px] px-3.5 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-electric-500 to-electric-400 hover:from-electric-400 hover:to-electric-300 text-navy-950 sm:text-white font-bold sm:font-semibold text-xs sm:text-sm shadow-glow transition-all duration-300 hover:-translate-y-0.5 whitespace-nowrap">
+            <span>Start Project</span>
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+
+          <!-- Mobile Hamburger / Drawer Button (48px touch target) -->
+          <button id="mobile-menu-btn" type="button" aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden min-w-[48px] min-h-[48px] flex items-center justify-center rounded-xl glass-panel text-silver-200 hover:text-white hover:border-electric-400/40 transition-colors">
+            <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Collapsible Mobile Navigation Drawer -->
+      <div id="mobile-menu" class="hidden md:hidden mt-2 glass-panel-bright rounded-2xl p-3 space-y-1.5 border border-electric-400/25 shadow-2xl">
+        <a href="#services" class="mobile-nav-link flex items-center justify-between min-h-[48px] px-4 py-3 rounded-xl text-base font-medium text-white hover:bg-white/10 transition-colors">
+          <span>Services</span>
+          <span class="text-xs text-electric-400">01</span>
+        </a>
+        <a href="#why-fast" class="mobile-nav-link flex items-center justify-between min-h-[48px] px-4 py-3 rounded-xl text-base font-medium text-white hover:bg-white/10 transition-colors">
+          <span>Why Fast</span>
+          <span class="text-xs text-electric-400">02</span>
+        </a>
+        <a href="#process" class="mobile-nav-link flex items-center justify-between min-h-[48px] px-4 py-3 rounded-xl text-base font-medium text-white hover:bg-white/10 transition-colors">
+          <span>3-Step Process</span>
+          <span class="text-xs text-electric-400">03</span>
+        </a>
+        <a href="#configurator" class="mobile-nav-link flex items-center justify-between min-h-[48px] px-4 py-3 rounded-xl text-base font-semibold text-gold-300 bg-electric-500/15 border border-gold-400/25 transition-colors">
+          <span>Instant Quote & Order</span>
+          <span>⚡</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. HIGH-IMPACT 3D HERO SECTION -->
+  <section id="top" class="relative min-h-[92svh] lg:min-h-screen flex items-center pt-24 sm:pt-28 pb-14 sm:pb-20 overflow-hidden">
+    <!-- Ambient Radial Glows -->
+    <div class="absolute top-1/4 -left-24 w-72 sm:w-96 h-72 sm:h-96 bg-electric-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-8 right-0 w-80 sm:w-[500px] h-80 sm:h-[500px] bg-electric-400/15 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <!-- Full-Section Interactive Three.js 3D Canvas (touch-action allows vertical scrolling on phones) -->
+    <div id="hero-canvas-container" class="absolute inset-0 z-0 cursor-grab active:cursor-grabbing touch-pan-y"></div>
+
+    <!-- Hero Foreground Content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pointer-events-none">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+        
+        <!-- Left Copy Column -->
+        <div class="lg:col-span-7 space-y-5 sm:space-y-7 pointer-events-auto">
+          <!-- Status Pill with Subtle Gold Accent -->
+          <div class="inline-flex items-center gap-2.5 px-3.5 sm:px-4 py-2 rounded-full glass-panel-bright text-xs sm:text-sm font-medium text-silver-200 border border-gold-400/30 shadow-glow-gold">
+            <span class="relative flex h-2.5 w-2.5 shrink-0">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-gold-400"></span>
+            </span>
+            <span>Express Delivery Slots Open • <strong class="text-gold-300 font-semibold">24–72h Turnaround</strong></span>
+          </div>
+
+          <!-- Main Headline -->
+          <h1 class="hero-title-fluid font-display font-extrabold tracking-tight text-white">
+            High-Speed Digital Execution.
+            <span class="block mt-1 text-transparent bg-clip-text bg-gradient-to-r from-electric-400 via-electric-300 to-gold-300">
+              Built to Convert.
+            </span>
+          </h1>
+
+          <!-- Subheadline -->
+          <p class="text-base sm:text-lg text-silver-300 max-w-2xl leading-relaxed font-normal">
+            Snippexzero delivers fast, custom websites, high-impact PowerPoint presentations, and scroll-stopping graphic designs—engineered for speed, clarity, and results.
+          </p>
+
+          <!-- Dual CTAs + Direct WhatsApp (Generous Mobile Touch Targets) -->
+          <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 pt-1 sm:pt-2">
+            <a href="#configurator" class="inline-flex items-center justify-center gap-2.5 min-h-[48px] px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-electric-500 to-electric-400 hover:from-electric-400 hover:to-electric-300 text-navy-950 sm:text-white font-bold text-sm sm:text-base shadow-glow transition-all duration-300 hover:-translate-y-0.5">
+              <span>Order a Fast Service</span>
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+
+            <a href="#services" class="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl glass-panel hover:bg-white/10 text-white font-semibold text-sm sm:text-base transition-all duration-300">
+              <span>Explore Services</span>
+            </a>
+
+            <a href="https://wa.me/201025296216?text=Hi%20Snippexzero!%20I%20want%20to%20start%20a%20fast%20digital%20project." target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 py-3.5 sm:py-4 rounded-2xl glass-panel border border-gold-400/30 hover:border-gold-400/70 text-gold-300 hover:text-white font-semibold text-sm transition-all duration-300">
+              <svg class="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+              </svg>
+              <span>WhatsApp Direct</span>
+            </a>
+          </div>
+
+          <!-- Trust / Speed Metrics Bar -->
+          <div class="grid grid-cols-3 gap-2.5 sm:gap-5 pt-2 sm:pt-4 max-w-xl">
+            <div class="glass-panel rounded-2xl p-3 sm:p-4 border-l-2 border-l-gold-400">
+              <div class="font-display font-extrabold text-base sm:text-2xl text-white">24–72h</div>
+              <div class="text-[11px] sm:text-sm text-silver-300">Turnaround</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-3 sm:p-4 border-l-2 border-l-electric-400">
+              <div class="font-display font-extrabold text-base sm:text-2xl text-white">100%</div>
+              <div class="text-[11px] sm:text-sm text-silver-300">Custom Built</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-3 sm:p-4 border-l-2 border-l-electric-500">
+              <div class="font-display font-extrabold text-base sm:text-2xl text-white">ROAS-Ready</div>
+              <div class="text-[11px] sm:text-sm text-silver-300">Conversion UX</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column Interactive 3D Floating Spec Card (Complements Three.js Centerpiece) -->
+        <div class="lg:col-span-5 flex justify-center lg:justify-end pointer-events-auto">
+          <div class="tilt-wrapper w-full max-w-md">
+            <div class="tilt-card glass-panel-bright rounded-3xl p-5 sm:p-7 shadow-2xl">
+              <div class="tilt-glare"></div>
+
+              <!-- Card Header -->
+              <div class="flex items-center justify-between gap-2 mb-5 sm:mb-6 tilt-content-z">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-500/80"></span>
+                  <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gold-400"></span>
+                  <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400/80"></span>
+                </div>
+                <span class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-electric-300 bg-electric-500/15 px-3 py-1 rounded-full border border-electric-400/30">
+                  3D Interactive Engine
+                </span>
+              </div>
+
+              <!-- Simulated Live Deliverable Preview -->
+              <div class="space-y-3.5 sm:space-y-4 tilt-content-z">
+                <div class="p-3.5 sm:p-4 rounded-2xl bg-navy-950/85 border border-white/10">
+                  <div class="flex items-center justify-between text-xs text-silver-300 mb-2">
+                    <span>Active Sprint Queue</span>
+                    <span class="text-gold-300 font-semibold">Live Ready</span>
+                  </div>
+                  <div class="space-y-2.5">
+                    <div class="flex items-center justify-between text-xs sm:text-sm gap-2">
+                      <span class="text-white font-medium flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-electric-400 shrink-0"></span>
+                        Landing Page & Storefront
+                      </span>
+                      <span class="text-xs font-mono text-silver-200 shrink-0">48h–72h</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-navy-800 rounded-full overflow-hidden">
+                      <div class="w-[92%] h-full bg-gradient-to-r from-electric-500 via-electric-400 to-gold-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="p-3.5 sm:p-4 rounded-2xl bg-navy-950/80 border border-white/10">
+                    <div class="text-xs text-silver-300 mb-1">Executive Decks</div>
+                    <div class="font-display font-bold text-white text-sm sm:text-base">24h Express</div>
+                    <div class="text-[11px] text-electric-300 mt-1">Pitch & Uni Ready</div>
+                  </div>
+                  <div class="p-3.5 sm:p-4 rounded-2xl bg-navy-950/80 border border-white/10">
+                    <div class="text-xs text-silver-300 mb-1">Ad & Brand Design</div>
+                    <div class="font-display font-bold text-white text-sm sm:text-base">24h Sprint</div>
+                    <div class="text-[11px] text-gold-300 mt-1">High-CTR Creatives</div>
+                  </div>
+                </div>
+
+                <div class="pt-1 flex items-center justify-between text-xs text-silver-300">
+                  <span class="hidden sm:inline">Move cursor across 3D scene & cards</span>
+                  <span class="sm:hidden">Drag 3D scene or tap below</span>
+                  <a href="#configurator" class="text-electric-400 font-semibold hover:underline py-1">Configure →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 3D INTERACTIVE CORE SERVICES SHOWCASE -->
+  <section id="services" class="relative py-16 sm:py-24 lg:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-3 sm:space-y-4">
+        <span class="inline-block px-4 py-1.5 rounded-full glass-panel text-xs font-semibold uppercase tracking-widest text-electric-400 border border-electric-400/20">
+          Core Fast-Track Services
+        </span>
+        <h2 class="section-title-fluid font-display font-extrabold text-white tracking-tight">
+          Three Disciplines. <span class="text-transparent bg-clip-text bg-gradient-to-r from-electric-400 to-gold-300">Zero Bottlenecks.</span>
+        </h2>
+        <p class="text-silver-300 text-sm sm:text-lg">
+          Tap or click any service below to load it straight into the instant project configurator.
+        </p>
+      </div>
+
+      <!-- 3D Tilt Service Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+
+        <!-- Service 1: Fast Website Development -->
+        <div class="tilt-wrapper">
+          <div class="tilt-card glass-panel-bright rounded-3xl p-6 sm:p-8 h-full flex flex-col justify-between group">
+            <div class="tilt-glare"></div>
+            <div class="space-y-5 sm:space-y-6 tilt-content-z">
+              <!-- Floating 3D Icon Badge -->
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-electric-500 to-electric-400 p-[1px] shadow-glow animate-float-3d tilt-badge-z">
+                <div class="w-full h-full bg-navy-950 rounded-[15px] flex items-center justify-center">
+                  <svg class="w-7 h-7 sm:w-8 sm:h-8 text-electric-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                    <polyline points="7 8 10 10 7 12"></polyline>
+                    <line x1="12" y1="12" x2="16" y2="12"></line>
+                  </svg>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <span class="text-xs font-mono uppercase tracking-wider text-gold-300 font-semibold">48–72 Hours</span>
+                  <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/5 text-silver-200 border border-white/10">High-Converting</span>
+                </div>
+                <h3 class="font-display font-bold text-xl sm:text-2xl text-white mb-2.5">Fast Website Development</h3>
+                <p class="text-silver-300 text-sm leading-relaxed">
+                  Landing pages, business websites, and e-commerce storefronts engineered for blazing load speeds, mobile perfection, and maximum lead or sales conversion.
+                </p>
+              </div>
+
+              <ul class="space-y-2.5 text-sm text-silver-200 pt-3 border-t border-white/10">
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Conversion-focused landing pages & funnels</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>E-commerce & direct WhatsApp checkout flows</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Responsive UI + interactive 3D visual polish</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="pt-6 sm:pt-8 tilt-content-z">
+              <button type="button" onclick="selectServiceAndScroll('Fast Website Development')" class="w-full min-h-[48px] py-3.5 px-5 rounded-xl bg-electric-500/20 hover:bg-electric-500 border border-electric-400/40 hover:border-electric-400 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                <span>Select Website Build</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 2: Fast PowerPoint Presentations -->
+        <div class="tilt-wrapper">
+          <div class="tilt-card glass-panel-bright rounded-3xl p-6 sm:p-8 h-full flex flex-col justify-between group">
+            <div class="tilt-glare"></div>
+            <div class="space-y-5 sm:space-y-6 tilt-content-z">
+              <!-- Floating 3D Icon Badge -->
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-electric-400 to-electric-500 p-[1px] shadow-glow animate-float-3d tilt-badge-z" style="animation-delay: 0.7s;">
+                <div class="w-full h-full bg-navy-950 rounded-[15px] flex items-center justify-center">
+                  <svg class="w-7 h-7 sm:w-8 sm:h-8 text-electric-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M2 3h20"></path>
+                    <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"></path>
+                    <path d="m7 21 5-5 5 5"></path>
+                    <line x1="8" y1="8" x2="12" y2="8"></line>
+                    <line x1="8" y1="11" x2="16" y2="11"></line>
+                  </svg>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <span class="text-xs font-mono uppercase tracking-wider text-gold-300 font-semibold">24–48 Hours</span>
+                  <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/5 text-silver-200 border border-white/10">Executive Grade</span>
+                </div>
+                <h3 class="font-display font-bold text-xl sm:text-2xl text-white mb-2.5">Fast PowerPoint Presentations</h3>
+                <p class="text-silver-300 text-sm leading-relaxed">
+                  Executive decks, university project presentations, and investor pitch decks structured with sharp visual hierarchy, modern layouts, and persuasive storytelling.
+                </p>
+              </div>
+
+              <ul class="space-y-2.5 text-sm text-silver-200 pt-3 border-t border-white/10">
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Investor pitch decks & corporate proposals</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>University & graduation project presentations</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Custom infographics, charts & editable PPTX</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="pt-6 sm:pt-8 tilt-content-z">
+              <button type="button" onclick="selectServiceAndScroll('Fast PowerPoint Presentation')" class="w-full min-h-[48px] py-3.5 px-5 rounded-xl bg-electric-500/20 hover:bg-electric-500 border border-electric-400/40 hover:border-electric-400 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                <span>Select Presentation Deck</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 3: Graphic & Ad Design -->
+        <div class="tilt-wrapper md:col-span-2 lg:col-span-1">
+          <div class="tilt-card glass-panel-bright rounded-3xl p-6 sm:p-8 h-full flex flex-col justify-between group">
+            <div class="tilt-glare"></div>
+            <div class="space-y-5 sm:space-y-6 tilt-content-z">
+              <!-- Floating 3D Icon Badge -->
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-electric-500 to-gold-400 p-[1px] shadow-glow animate-float-3d tilt-badge-z" style="animation-delay: 1.4s;">
+                <div class="w-full h-full bg-navy-950 rounded-[15px] flex items-center justify-center">
+                  <svg class="w-7 h-7 sm:w-8 sm:h-8 text-gold-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+                  </svg>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <span class="text-xs font-mono uppercase tracking-wider text-gold-300 font-semibold">24 Hours</span>
+                  <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/5 text-silver-200 border border-white/10">Scroll-Stopping</span>
+                </div>
+                <h3 class="font-display font-bold text-xl sm:text-2xl text-white mb-2.5">Graphic & Ad Design</h3>
+                <p class="text-silver-300 text-sm leading-relaxed">
+                  Scroll-stopping social media visuals, brand collateral, flyers, and performance-ready ad creatives built with media-buying hooks that drive clicks.
+                </p>
+              </div>
+
+              <ul class="space-y-2.5 text-sm text-silver-200 pt-3 border-t border-white/10">
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Meta, TikTok & LinkedIn paid ad creatives</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Social media carousels, banners & thumbnails</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-electric-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Brand flyers, visual identity kits & mockups</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="pt-6 sm:pt-8 tilt-content-z">
+              <button type="button" onclick="selectServiceAndScroll('Graphic & Ad Design')" class="w-full min-h-[48px] py-3.5 px-5 rounded-xl bg-electric-500/20 hover:bg-electric-500 border border-electric-400/40 hover:border-electric-400 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                <span>Select Design Package</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. WHY SNIPPEXZERO (3D FEATURE GRID) -->
+  <section id="why-fast" class="relative py-16 sm:py-20 border-y border-white/10 bg-navy-900/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-10 sm:mb-14 gap-4 sm:gap-6">
+        <div class="max-w-2xl">
+          <span class="text-xs font-mono uppercase tracking-widest text-gold-300">The Snippexzero Advantage</span>
+          <h2 class="section-title-fluid font-display font-extrabold text-white mt-2">
+            Engineered Where Design Meets Performance Marketing.
+          </h2>
+        </div>
+        <p class="text-silver-300 text-sm sm:text-base max-w-md leading-relaxed">
+          Most freelancers take weeks and focus only on decoration. We build assets structured around buyer psychology, clarity, and rapid deployment.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        <!-- Feature 1 -->
+        <div class="tilt-wrapper">
+          <div class="tilt-card glass-panel rounded-2xl p-5 sm:p-6 h-full">
+            <div class="tilt-glare"></div>
+            <div class="w-11 h-11 rounded-xl bg-electric-500/15 border border-electric-400/30 flex items-center justify-center text-electric-400 mb-4 tilt-content-z">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2 tilt-content-z">Speed Without Compromise</h3>
+            <p class="text-sm text-silver-300 leading-relaxed tilt-content-z">
+              Streamlined workflows let us ship polished websites, decks, and ad visuals in 24 to 72 hours.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="tilt-wrapper">
+          <div class="tilt-card glass-panel rounded-2xl p-5 sm:p-6 h-full">
+            <div class="tilt-glare"></div>
+            <div class="w-11 h-11 rounded-xl bg-electric-500/15 border border-electric-400/30 flex items-center justify-center text-electric-400 mb-4 tilt-content-z">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2 tilt-content-z">Conversion-Driven Layout</h3>
+            <p class="text-sm text-silver-300 leading-relaxed tilt-content-z">
+              Every headline, visual hierarchy, and call-to-action is positioned to turn traffic into leads and sales.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="tilt-wrapper">
+          <div class="tilt-card glass-panel rounded-2xl p-5 sm:p-6 h-full">
+            <div class="tilt-glare"></div>
+            <div class="w-11 h-11 rounded-xl bg-electric-500/15 border border-electric-400/30 flex items-center justify-center text-electric-400 mb-4 tilt-content-z">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2 tilt-content-z">Clean Corporate Aesthetics</h3>
+            <p class="text-sm text-silver-300 leading-relaxed tilt-content-z">
+              Modern, authoritative visual design that elevates brand credibility across web, mobile, and boardrooms.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="tilt-wrapper">
+          <div class="tilt-card glass-panel rounded-2xl p-5 sm:p-6 h-full">
+            <div class="tilt-glare"></div>
+            <div class="w-11 h-11 rounded-xl bg-gold-400/15 border border-gold-400/30 flex items-center justify-center text-gold-300 mb-4 tilt-content-z">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2 tilt-content-z">Direct 1-on-1 Execution</h3>
+            <p class="text-sm text-silver-300 leading-relaxed tilt-content-z">
+              No agency middlemen or slow ticket queues—communicate directly via WhatsApp or Email from brief to launch.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 3-STEP RAPID PROCESS -->
+  <section id="process" class="relative py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+        <span class="text-xs font-mono uppercase tracking-widest text-electric-400">How It Works</span>
+        <h2 class="section-title-fluid font-display font-extrabold text-white mt-2">From Idea to Live Asset in 3 Steps</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+        <div class="glass-panel rounded-2xl p-6 sm:p-7 relative overflow-hidden">
+          <span class="font-display font-extrabold text-6xl text-white/[0.04] absolute -top-2 right-4 select-none">01</span>
+          <div class="w-9 h-9 rounded-lg bg-electric-500 text-white font-bold text-sm flex items-center justify-center mb-4">1</div>
+          <h3 class="font-display font-bold text-lg sm:text-xl text-white mb-2">Configure Your Brief</h3>
+          <p class="text-sm text-silver-300 leading-relaxed">Choose your service, select Standard or Express 24–48h delivery, and drop a quick summary of what you need.</p>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-6 sm:p-7 relative overflow-hidden">
+          <span class="font-display font-extrabold text-6xl text-white/[0.04] absolute -top-2 right-4 select-none">02</span>
+          <div class="w-9 h-9 rounded-lg bg-electric-400 text-navy-950 font-extrabold text-sm flex items-center justify-center mb-4">2</div>
+          <h3 class="font-display font-bold text-lg sm:text-xl text-white mb-2">Rapid Design & Build</h3>
+          <p class="text-sm text-silver-300 leading-relaxed">We craft your custom website, presentation, or ad visuals with live progress updates and clean revision loops.</p>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-6 sm:p-7 relative overflow-hidden">
+          <span class="font-display font-extrabold text-6xl text-white/[0.04] absolute -top-2 right-4 select-none">03</span>
+          <div class="w-9 h-9 rounded-lg bg-gold-400 text-navy-950 font-extrabold text-sm flex items-center justify-center mb-4">3</div>
+          <h3 class="font-display font-bold text-lg sm:text-xl text-white mb-2">Launch & Convert</h3>
+          <p class="text-sm text-silver-300 leading-relaxed">Receive production-ready files, live web code, or editable decks ready to deploy immediately.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. INTERACTIVE "INSTANT PROJECT CONFIGURATOR & QUOTE ESTIMATOR" -->
+  <section id="configurator" class="relative py-16 sm:py-24 lg:py-28">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-electric-500/5 to-transparent pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-14 space-y-3">
+        <span class="inline-block px-4 py-1.5 rounded-full glass-panel text-xs font-semibold uppercase tracking-widest text-gold-300 border border-gold-400/25">
+          Zero-Friction Order Builder
+        </span>
+        <h2 class="section-title-fluid font-display font-extrabold text-white">
+          Configure Your Project & <span class="text-transparent bg-clip-text bg-gradient-to-r from-electric-400 to-gold-300">Start Instantly</span>
+        </h2>
+        <p class="text-silver-300 text-sm sm:text-base">
+          Customize your scope below to generate an instant timeline estimate and send your brief directly to WhatsApp or Email in one tap.
+        </p>
+      </div>
+
+      <div class="glass-panel-bright rounded-3xl p-5 sm:p-8 lg:p-10 shadow-2xl border border-electric-400/25">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+          
+          <!-- Left Form Controls (7 Columns) -->
+          <div class="lg:col-span-7 space-y-6 sm:space-y-7">
+            
+            <!-- Step 1: Select Service -->
+            <div>
+              <label class="block text-xs font-mono uppercase tracking-wider text-electric-400 mb-3">
+                1. Choose Your Service
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="service-selector">
+                <button type="button" data-service="Fast Website Development" data-base-days="2–3 Days" data-scope="Custom responsive landing page / storefront with conversion UX" class="service-option active min-h-[56px] text-left p-4 rounded-2xl border border-electric-400 bg-electric-500/20 transition-all">
+                  <div class="font-display font-bold text-white text-sm">Fast Website Development</div>
+                  <div class="text-xs text-silver-200 mt-1">Landing pages, business & e-com</div>
+                </button>
+
+                <button type="button" data-service="Fast PowerPoint Presentation" data-base-days="24–48 Hours" data-scope="Custom slide deck with modern layout, charts & visual hierarchy" class="service-option min-h-[56px] text-left p-4 rounded-2xl border border-white/10 bg-navy-950/65 hover:border-white/30 transition-all">
+                  <div class="font-display font-bold text-white text-sm">Fast PowerPoint Presentation</div>
+                  <div class="text-xs text-silver-300 mt-1">Pitch decks, executive & uni slides</div>
+                </button>
+
+                <button type="button" data-service="Graphic & Ad Design" data-base-days="24 Hours" data-scope="High-CTR social ads, brand flyers & visual creatives" class="service-option min-h-[56px] text-left p-4 rounded-2xl border border-white/10 bg-navy-950/65 hover:border-white/30 transition-all">
+                  <div class="font-display font-bold text-white text-sm">Graphic & Ad Design</div>
+                  <div class="text-xs text-silver-300 mt-1">Ad creatives, social kits & flyers</div>
+                </button>
+
+                <button type="button" data-service="Full Launch Bundle (Web + Deck/Ads)" data-base-days="3–4 Days" data-scope="Complete conversion website paired with pitch deck or ad creative pack" class="service-option min-h-[56px] text-left p-4 rounded-2xl border border-white/10 bg-navy-950/65 hover:border-white/30 transition-all">
+                  <div class="font-display font-bold text-white text-sm">Full Launch Bundle</div>
+                  <div class="text-xs text-silver-300 mt-1">Website + Presentation or Ad Pack</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 2: Turnaround Speed -->
+            <div>
+              <label class="block text-xs font-mono uppercase tracking-wider text-electric-400 mb-3">
+                2. Turnaround Speed
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="speed-selector">
+                <button type="button" data-speed="Standard Priority (3–5 Days)" data-timeline-override="" class="speed-option min-h-[56px] text-left p-4 rounded-2xl border border-white/10 bg-navy-950/65 hover:border-white/30 transition-all">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-display font-bold text-white text-sm">Standard Priority</span>
+                    <span class="text-[11px] px-2 py-0.5 rounded bg-white/10 text-silver-200">3–5 Days</span>
+                  </div>
+                  <div class="text-xs text-silver-300 mt-1">Balanced schedule with full iterations</div>
+                </button>
+
+                <button type="button" data-speed="Express Rush (24–48 Hours)" data-timeline-override="24–48 Hours (Express Rush)" class="speed-option active min-h-[56px] text-left p-4 rounded-2xl border border-gold-400 bg-electric-500/20 transition-all">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-display font-bold text-white text-sm flex items-center gap-1.5">
+                      <span class="text-gold-300">⚡ Express Rush</span>
+                    </span>
+                    <span class="text-[11px] px-2 py-0.5 rounded bg-gold-400/20 text-gold-300 font-semibold">24–48h</span>
+                  </div>
+                  <div class="text-xs text-silver-200 mt-1">Top queue priority for urgent deadlines</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 3: Client Name & Project Brief -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="client-name" class="block text-xs font-mono uppercase tracking-wider text-silver-200 mb-2">
+                  Your Name / Brand
+                </label>
+                <input id="client-name" type="text" autocomplete="name" placeholder="e.g. Alex / Apex Labs" class="w-full min-h-[48px] px-4 py-3 rounded-xl bg-navy-950/85 border border-white/15 focus:border-electric-400 focus:outline-none text-sm text-white placeholder-slate-400 transition-colors" />
+              </div>
+              <div>
+                <label for="client-contact" class="block text-xs font-mono uppercase tracking-wider text-silver-200 mb-2">
+                  Your Email or Phone (Optional)
+                </label>
+                <input id="client-contact" type="text" autocomplete="email" placeholder="e.g. alex@company.com" class="w-full min-h-[48px] px-4 py-3 rounded-xl bg-navy-950/85 border border-white/15 focus:border-electric-400 focus:outline-none text-sm text-white placeholder-slate-400 transition-colors" />
+              </div>
+            </div>
+
+            <div>
+              <label for="project-brief" class="block text-xs font-mono uppercase tracking-wider text-silver-200 mb-2">
+                Project Details / Goals
+              </label>
+              <textarea id="project-brief" rows="3" placeholder="Briefly describe your website, presentation topic, or design needs..." class="w-full min-h-[96px] px-4 py-3 rounded-xl bg-navy-950/85 border border-white/15 focus:border-electric-400 focus:outline-none text-sm text-white placeholder-slate-400 transition-colors"></textarea>
+            </div>
+          </div>
+
+          <!-- Right Live Summary & Direct Conversion Card (5 Columns) -->
+          <div class="lg:col-span-5 flex flex-col justify-between bg-navy-950/90 rounded-2xl p-5 sm:p-7 border border-white/10">
+            <div class="space-y-5">
+              <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                <span class="text-xs font-mono uppercase tracking-widest text-silver-300">Live Project Summary</span>
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gold-300">
+                  <span class="w-2 h-2 rounded-full bg-gold-400"></span>
+                  Available Now
+                </span>
+              </div>
+
+              <div>
+                <div class="text-xs text-silver-300">Selected Service</div>
+                <div id="summary-service" class="font-display font-bold text-lg sm:text-xl text-white mt-0.5">Fast Website Development</div>
+                <p id="summary-scope" class="text-xs text-silver-300 mt-1.5 leading-relaxed">
+                  Custom responsive landing page / storefront with conversion UX
+                </p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <div class="p-3.5 rounded-xl bg-navy-900/90 border border-white/10">
+                  <div class="text-[11px] text-silver-300">Delivery Speed</div>
+                  <div id="summary-speed" class="font-semibold text-sm text-gold-300 mt-0.5">Express Rush</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-navy-900/90 border border-white/10">
+                  <div class="text-[11px] text-silver-300">Est. Turnaround</div>
+                  <div id="summary-timeline" class="font-semibold text-sm text-white mt-0.5">24–48 Hours</div>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-electric-500/10 border border-electric-400/25 text-xs text-silver-200 leading-relaxed">
+                <strong class="text-electric-300">Direct Action:</strong> Tapping below pre-fills your exact project specifications so we can confirm scope and kick off immediately.
+              </div>
+            </div>
+
+            <!-- Action Buttons (48px+ touch targets) -->
+            <div class="space-y-3 pt-6 mt-6 border-t border-white/10">
+              <button type="button" onclick="launchWhatsAppOrder()" class="w-full min-h-[48px] py-4 px-5 rounded-xl bg-gradient-to-r from-electric-500 to-electric-400 hover:from-electric-400 hover:to-electric-300 text-navy-950 sm:text-white font-bold text-sm shadow-glow transition-all duration-300 flex items-center justify-center gap-2.5 hover:-translate-y-0.5">
+                <svg class="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+                </svg>
+                <span>Send Order via WhatsApp</span>
+              </button>
+
+              <button type="button" onclick="launchEmailOrder()" class="w-full min-h-[48px] py-3.5 px-5 rounded-xl glass-panel hover:bg-white/10 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4 text-gold-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span>Send Inquiry via Email</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. SLEEK FOOTER -->
+  <footer class="border-t border-white/10 bg-navy-950/95 py-10 sm:py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+        <!-- Brand -->
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-electric-500 to-gold-400 p-[1px] shrink-0">
+            <div class="w-full h-full bg-navy-950 rounded-[11px] flex items-center justify-center">
+              <svg class="w-4 h-4 text-electric-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <span class="font-display font-extrabold text-lg text-white">Snippex<span class="text-electric-400">zero</span></span>
+            <p class="text-xs text-silver-300">High-Speed Websites, Presentations & Design</p>
+          </div>
+        </div>
+
+        <!-- Direct Contact Links -->
+        <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-silver-200">
+          <a href="https://wa.me/201025296216" target="_blank" rel="noopener noreferrer" class="py-2 hover:text-gold-300 transition-colors flex items-center gap-1.5">
+            <span>WhatsApp (+20 102 529 6216)</span>
+          </a>
+          <a href="mailto:mazenehab1107@gmail.com" class="py-2 hover:text-electric-400 transition-colors">
+            mazenehab1107@gmail.com
+          </a>
+          <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="py-2 hover:text-electric-400 transition-colors">
+            LinkedIn
+          </a>
+        </div>
+
+        <!-- Copyright -->
+        <div class="text-xs text-slate-400">
+          © <span id="current-year"></span> Snippexzero. All rights reserved.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE LOGIC & THREE.JS 3D ENGINE -->
+  <script>
+    // Set current year in footer
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    // Detect touch / mobile / reduced-motion preferences for optimal responsiveness
+    const isTouchOrMobile = window.matchMedia('(hover: none), (pointer: coarse)').matches || window.innerWidth < 768;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Collapsible Mobile Menu Drawer with ARIA & auto-close on link tap
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIconOpen = document.getElementById('menu-icon-open');
+    const menuIconClose = document.getElementById('menu-icon-close');
+
+    function setMobileMenuState(isOpen) {
+      mobileMenu.classList.toggle('hidden', !isOpen);
+      mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+      menuIconOpen.classList.toggle('hidden', isOpen);
+      menuIconClose.classList.toggle('hidden', !isOpen);
+    }
+
+    mobileMenuBtn.addEventListener('click', () => {
+      const currentlyHidden = mobileMenu.classList.contains('hidden');
+      setMobileMenuState(currentlyHidden);
+    });
+
+    document.querySelectorAll('.mobile-nav-link').forEach((link) => {
+      link.addEventListener('click', () => setMobileMenuState(false));
+    });
+
+    // Toast notification helper
+    function showToast(message) {
+      const toast = document.getElementById('toast-notification');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = message;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3200);
+    }
+
+    // ==========================================
+    // 1. 3D INTERACTIVE TILT & GLARE CARDS (Desktop/Pointer)
+    // ==========================================
+    function initTiltCards() {
+      if (isTouchOrMobile || prefersReducedMotion) return;
+
+      const cards = document.querySelectorAll('.tilt-card');
+      cards.forEach((card) => {
+        const glare = card.querySelector('.tilt-glare');
+
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+
+          // Subtle, crisp 3D rotation angles
+          const rotateX = ((y - centerY) / centerY) * -8;
+          const rotateY = ((x - centerX) / centerX) * 8;
+
+          card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
+
+          if (glare) {
+            const glareX = (x / rect.width) * 100;
+            const glareY = (y / rect.height) * 100;
+            glare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(56, 189, 248, 0.24), transparent 65%)`;
+          }
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+      });
+    }
+    initTiltCards();
+
+    // ==========================================
+    // 2. INSTANT PROJECT CONFIGURATOR LOGIC
+    // ==========================================
+    const configState = {
+      service: 'Fast Website Development',
+      baseDays: '2–3 Days',
+      scope: 'Custom responsive landing page / storefront with conversion UX',
+      speed: 'Express Rush (24–48 Hours)',
+      isExpress: true
+    };
+
+    const serviceButtons = document.querySelectorAll('.service-option');
+    const speedButtons = document.querySelectorAll('.speed-option');
+
+    function updateConfiguratorUI() {
+      document.getElementById('summary-service').textContent = configState.service;
+      document.getElementById('summary-scope').textContent = configState.scope;
+      document.getElementById('summary-speed').textContent = configState.isExpress ? 'Express Rush' : 'Standard Priority';
+      document.getElementById('summary-timeline').textContent = configState.isExpress ? '24–48 Hours' : configState.baseDays;
+    }
+
+    serviceButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        serviceButtons.forEach((b) => {
+          b.classList.remove('active', 'border-electric-400', 'bg-electric-500/20');
+          b.classList.add('border-white/10', 'bg-navy-950/65');
+        });
+        btn.classList.add('active', 'border-electric-400', 'bg-electric-500/20');
+        btn.classList.remove('border-white/10', 'bg-navy-950/65');
+
+        configState.service = btn.dataset.service;
+        configState.baseDays = btn.dataset.baseDays;
+        configState.scope = btn.dataset.scope;
+        updateConfiguratorUI();
+      });
+    });
+
+    speedButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        speedButtons.forEach((b) => {
+          b.classList.remove('active', 'border-gold-400', 'bg-electric-500/20');
+          b.classList.add('border-white/10', 'bg-navy-950/65');
+        });
+        btn.classList.add('active', 'border-gold-400', 'bg-electric-500/20');
+        btn.classList.remove('border-white/10', 'bg-navy-950/65');
+
+        configState.speed = btn.dataset.speed;
+        configState.isExpress = btn.dataset.speed.includes('Express');
+        updateConfiguratorUI();
+      });
+    });
+
+    // Triggered from Service Cards
+    function selectServiceAndScroll(serviceName) {
+      serviceButtons.forEach((btn) => {
+        if (btn.dataset.service === serviceName) {
+          btn.click();
+        }
+      });
+      const target = document.getElementById('configurator');
+      if (target) {
+        target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      }
+      showToast(`Selected: ${serviceName}`);
+    }
+
+    function buildFormattedOrderMessage() {
+      const clientName = document.getElementById('client-name').value.trim() || 'Not specified';
+      const clientContact = document.getElementById('client-contact').value.trim() || 'Not specified';
+      const brief = document.getElementById('project-brief').value.trim() || 'Ready to discuss project details.';
+      const timeline = configState.isExpress ? '24–48 Hours (Express Rush)' : configState.baseDays;
+
+      return (
+        `Hi Snippexzero! I'd like to start a project:\n\n` +
+        `• Service: ${configState.service}\n` +
+        `• Speed: ${configState.speed}\n` +
+        `• Est. Timeline: ${timeline}\n` +
+        `• Name / Brand: ${clientName}\n` +
+        `• Contact: ${clientContact}\n` +
+        `• Project Brief: ${brief}`
+      );
+    }
+
+    function launchWhatsAppOrder() {
+      const text = encodeURIComponent(buildFormattedOrderMessage());
+      const url = `https://wa.me/201025296216?text=${text}`;
+      showToast('Opening WhatsApp with your project brief...');
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    function launchEmailOrder() {
+      const subject = encodeURIComponent(`New Snippexzero Project: ${configState.service}`);
+      const body = encodeURIComponent(buildFormattedOrderMessage());
+      const mailtoUrl = `mailto:mazenehab1107@gmail.com?subject=${subject}&body=${body}`;
+      showToast('Opening your email client with pre-filled brief...');
+      window.location.href = mailtoUrl;
+    }
+
+    // ==========================================
+    // 3. THREE.JS INTERACTIVE 3D HERO ENGINE (Device-Scaled Density)
+    // ==========================================
+    function initThreeHero() {
+      const container = document.getElementById('hero-canvas-container');
+      if (!container || typeof THREE === 'undefined') return;
+
+      const isCompactViewport = window.innerWidth < 1024 || isTouchOrMobile;
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x070d1a, 0.035);
+
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(0, 0, isCompactViewport ? 16 : 14);
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: !isCompactViewport,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isCompactViewport ? 1.5 : 2));
+      container.appendChild(renderer.domElement);
+
+      // Lighting Setup (Dark Navy, Electric Blue, Cyan & Subtle Gold Rim)
+      const ambientLight = new THREE.AmbientLight(0x1a2f5a, 1.8);
+      scene.add(ambientLight);
+
+      const pointLight1 = new THREE.PointLight(0x38bdf8, 3.2, 40);
+      pointLight1.position.set(6, 5, 8);
+      scene.add(pointLight1);
+
+      const pointLight2 = new THREE.PointLight(0x2563eb, 3.5, 45);
+      pointLight2.position.set(-7, -4, 6);
+      scene.add(pointLight2);
+
+      const goldAccentLight = new THREE.PointLight(0xfbbf24, 1.4, 30);
+      goldAccentLight.position.set(0, 7, 4);
+      scene.add(goldAccentLight);
+
+      // Master Interactive Group
+      const heroGroup = new THREE.Group();
+      heroGroup.position.x = window.innerWidth >= 1024 ? 2.4 : 0;
+      const baseScale = isCompactViewport ? 0.78 : 1;
+      heroGroup.scale.setScalar(baseScale);
+      scene.add(heroGroup);
+
+      // Central Sculpture: Sleek Metallic/Glass TorusKnot (lighter segments on mobile)
+      const knotSegments = isCompactViewport ? [96, 18] : [180, 32];
+      const knotGeo = new THREE.TorusKnotGeometry(2.35, 0.62, knotSegments[0], knotSegments[1]);
+      const knotMat = new THREE.MeshPhysicalMaterial({
+        color: 0x0c162b,
+        emissive: 0x1d4ed8,
+        emissiveIntensity: 0.45,
+        metalness: 0.85,
+        roughness: 0.15,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.08,
+        reflectivity: 1.0
+      });
+      const torusKnot = new THREE.Mesh(knotGeo, knotMat);
+      heroGroup.add(torusKnot);
+
+      // Wireframe Energy Cage around TorusKnot
+      const wireGeo = new THREE.TorusKnotGeometry(2.42, 0.65, isCompactViewport ? 56 : 90, 14);
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.16
+      });
+      const wireKnot = new THREE.Mesh(wireGeo, wireMat);
+      heroGroup.add(wireKnot);
+
+      // Orbiting Glassmorphic Isometric UI Slabs
+      const slabGroup = new THREE.Group();
+      heroGroup.add(slabGroup);
+
+      const slabConfigs = [
+        { w: 2.2, h: 1.4, d: 0.12, pos: [-3.8, 2.2, 1.5], rot: [0.2, 0.4, -0.15], color: 0x2563eb, edge: 0x38bdf8 },
+        { w: 2.0, h: 1.25, d: 0.12, pos: [3.9, -2.0, 1.8], rot: [-0.25, -0.45, 0.12], color: 0x38bdf8, edge: 0x38bdf8 },
+        { w: 1.6, h: 1.6, d: 0.12, pos: [3.4, 2.5, -1.2], rot: [0.3, -0.3, 0.2], color: 0x1d4ed8, edge: 0xfbbf24 }
+      ];
+
+      const slabs = [];
+      slabConfigs.forEach((cfg, idx) => {
+        const geo = new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d);
+        const mat = new THREE.MeshPhysicalMaterial({
+          color: 0x122140,
+          emissive: cfg.color,
+          emissiveIntensity: 0.28,
+          metalness: 0.3,
+          roughness: 0.1,
+          transparent: true,
+          opacity: 0.72,
+          clearcoat: 1.0
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(...cfg.pos);
+        mesh.rotation.set(...cfg.rot);
+
+        const edges = new THREE.EdgesGeometry(geo);
+        const lineMat = new THREE.LineBasicMaterial({ color: cfg.edge, transparent: true, opacity: 0.65 });
+        const wireframe = new THREE.LineSegments(edges, lineMat);
+        mesh.add(wireframe);
+
+        slabGroup.add(mesh);
+        slabs.push({ mesh, baseY: cfg.pos[1], offset: idx * 1.8 });
+      });
+
+      // Orbiting Precision Rings
+      const ringGeo = new THREE.TorusGeometry(4.3, 0.025, 12, isCompactViewport ? 72 : 120);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
+      const ring1 = new THREE.Mesh(ringGeo, ringMat);
+      ring1.rotation.x = Math.PI / 2.6;
+      ring1.rotation.y = 0.25;
+      heroGroup.add(ring1);
+
+      const ring2 = new THREE.Mesh(
+        new THREE.TorusGeometry(5.1, 0.018, 12, isCompactViewport ? 72 : 120),
+        new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.22 })
+      );
+      ring2.rotation.x = -Math.PI / 3;
+      heroGroup.add(ring2);
+
+      // Particle Depth Field (lighter count on mobile/compact screens)
+      const particleCount = isCompactViewport ? 140 : 420;
+      const particleGeo = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      for (let i = 0; i < particleCount * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 32;
+        positions[i + 1] = (Math.random() - 0.5) * 22;
+        positions[i + 2] = (Math.random() - 0.5) * 22 - 3;
+      }
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const particleMat = new THREE.PointsMaterial({
+        color: 0x38bdf8,
+        size: isCompactViewport ? 0.08 : 0.065,
+        transparent: true,
+        opacity: 0.65
+      });
+      const particles = new THREE.Points(particleGeo, particleMat);
+      scene.add(particles);
+
+      // Interactive Mouse & Touch Tracking
+      let targetMouseX = 0;
+      let targetMouseY = 0;
+      let currentMouseX = 0;
+      let currentMouseY = 0;
+
+      window.addEventListener('mousemove', (event) => {
+        targetMouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        targetMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (event) => {
+        if (event.touches.length > 0) {
+          targetMouseX = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+          targetMouseY = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
+        }
+      }, { passive: true });
+
+      // Responsive Resize Handler
+      window.addEventListener('resize', () => {
+        if (!container) return;
+        const nowCompact = window.innerWidth < 1024 || window.matchMedia('(hover: none), (pointer: coarse)').matches;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.position.z = nowCompact ? 16 : 14;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, nowCompact ? 1.5 : 2));
+        heroGroup.position.x = window.innerWidth >= 1024 ? 2.4 : 0;
+        heroGroup.scale.setScalar(nowCompact ? 0.78 : 1);
+      });
+
+      // 60FPS Animation Loop (Static clean frame if user prefers reduced motion)
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+
+        if (prefersReducedMotion) {
+          renderer.render(scene, camera);
+          return;
+        }
+
+        const elapsed = clock.getElapsedTime();
+
+        // Smooth damping toward cursor/touch
+        currentMouseX += (targetMouseX - currentMouseX) * 0.05;
+        currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+
+        // Scroll parallax depth
+        const scrollY = window.scrollY;
+        heroGroup.position.y = scrollY * 0.0025;
+
+        // Rotate central 3D sculpture
+        torusKnot.rotation.x = elapsed * 0.22 + currentMouseY * 0.45;
+        torusKnot.rotation.y = elapsed * 0.32 + currentMouseX * 0.55;
+        wireKnot.rotation.copy(torusKnot.rotation);
+
+        // Rotate orbital rings
+        ring1.rotation.z = elapsed * 0.18;
+        ring2.rotation.z = -elapsed * 0.14;
+
+        // Float isometric glass slabs
+        slabs.forEach((item) => {
+          item.mesh.position.y = item.baseY + Math.sin(elapsed * 1.4 + item.offset) * 0.25;
+          item.mesh.rotation.y += 0.004;
+        });
+
+        // Subtle camera & particle drift
+        particles.rotation.y = elapsed * 0.03 + currentMouseX * 0.08;
+        particles.rotation.x = currentMouseY * 0.05;
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    }
+
+    // Initialize Three.js once window loads
+    window.addEventListener('load', initThreeHero);
+  </script>
+</body>
+</html>
